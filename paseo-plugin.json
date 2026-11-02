@@ -1,0 +1,18 @@
+{
+  "id": "file-actions",
+  "media": [
+    "assets/open-with-menu.png"
+  ],
+  "requirements": {
+    "paseo": ">=0.14.0"
+  },
+  "name": "File Actions",
+  "description": "Run your own programs and commands on a file from its tab's Open with… menu, such as opening a Markdown note in Obsidian.",
+  "translations": {
+    "zh-CN": {
+      "name": "文件动作",
+      "description": "在文件标签页的“打开方式…”菜单里，用你配置的程序或命令处理当前文件，例如用 Obsidian 打开 Markdown。"
+    }
+  },
+  "icon": "assets/icon.png"
+}
