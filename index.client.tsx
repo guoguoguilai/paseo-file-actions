@@ -2,9 +2,7 @@ import { ScrollView } from "react-native";
 import type { PluginClientContext, PluginSurfaceProps } from "@getpaseo/plugin/client";
 import { messages } from "./client/messages";
 import { installPanels } from "./client/panels";
-import { SettingsScreen } from "./client/settings";
-
-const SETTINGS_ID = "file-actions";
+import { SETTINGS_ID, SettingsScreen } from "./client/settings";
 
 export default function contribute(client: PluginClientContext) {
   const panels = installPanels(client);

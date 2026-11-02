@@ -5,6 +5,8 @@ import { Icon, SettingsAction, SettingsCard, SettingsInput, SettingsRow, Setting
 import { mergeActions, fileActionsSettings, PRESETS, isPresetId, resolveAction, type Action } from "../shared/file-actions";
 import { messages } from "./messages";
 
+export const SETTINGS_ID = "file-actions";
+
 type Props = PluginSurfaceProps & { onSaved(): void };
 
 export function SettingsScreen(props: Props) {

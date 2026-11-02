@@ -4,6 +4,7 @@ import type { PluginClientContext, PluginFilePanelProps } from "@getpaseo/plugin
 import { Icon } from "@getpaseo/plugin/client/ui";
 import { runRpc, type ListedAction } from "../shared/file-actions";
 import { messages } from "./messages";
+import { SETTINGS_ID } from "./settings";
 import { Preview } from "./preview";
 
 type State = { phase: "idle" } | { phase: "running" } | { phase: "done"; output: string } | { phase: "error"; message: string };
@@ -45,6 +46,14 @@ export function createPanel(client: PluginClientContext, action: ListedAction) {
             <Text style={{ flex: 1, color: failed ? c.statusDanger : c.foregroundMuted, fontSize: 13 }} numberOfLines={1}>
               {title}
             </Text>
+            <Pressable
+              accessibilityRole="button"
+              accessibilityLabel={client.i18n.t(messages, "openSettings")}
+              onPress={() => client.openSettings(SETTINGS_ID)}
+              style={{ padding: 6 }}
+            >
+              <Icon name="Settings2" size={16} color={c.foregroundMuted} />
+            </Pressable>
             <Pressable
               accessibilityRole="button"
               accessibilityLabel={buttonLabel}
