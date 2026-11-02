@@ -1,8 +1,8 @@
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Pressable, Text, View } from "react-native";
 import type { PluginClientContext, PluginFilePanelProps } from "@getpaseo/plugin/client";
 import { Icon } from "@getpaseo/plugin/client/ui";
-import { runRpc, type ListedAction } from "../shared/file-actions";
+import { checkRpc, runRpc, type ListedAction } from "../shared/file-actions";
 import { messages } from "./messages";
 import { SETTINGS_ID } from "./settings";
 import { Preview } from "./preview";
@@ -18,6 +18,19 @@ export function createPanel(client: PluginClientContext, action: ListedAction) {
     const c = theme.colors;
     const padding = layout.compact ? 12 : 20;
     const [state, setState] = useState<State>({ phase: "idle" });
+    /** null while asking; false when the file lives on another machine than this plugin's daemon. */
+    const [local, setLocal] = useState<boolean | null>(null);
+
+    useEffect(() => {
+      let current = true;
+      client
+        .rpc(checkRpc, { path: file.path, size: file.size, modifiedAt: file.modifiedAt })
+        .then((result) => current && setLocal(result.local))
+        .catch(() => current && setLocal(false));
+      return () => {
+        current = false;
+      };
+    }, [file.path, file.size, file.modifiedAt]);
 
     const run = useCallback(() => {
       setState({ phase: "running" });
@@ -30,7 +43,9 @@ export function createPanel(client: PluginClientContext, action: ListedAction) {
     const failed = state.phase === "error";
     const buttonLabel = client.i18n.t(messages, state.phase === "idle" ? "open" : "again", { name: action.name });
     const title =
-      state.phase === "idle"
+      local === false
+        ? client.i18n.t(messages, "remote")
+        : state.phase === "idle"
         ? file.name
         : state.phase === "running"
         ? client.i18n.t(messages, "opening", { name: action.name })
@@ -54,15 +69,17 @@ export function createPanel(client: PluginClientContext, action: ListedAction) {
             >
               <Icon name="Settings2" size={16} color={c.foregroundMuted} />
             </Pressable>
-            <Pressable
-              accessibilityRole="button"
-              accessibilityLabel={buttonLabel}
-              disabled={state.phase === "running"}
-              onPress={run}
-              style={{ paddingHorizontal: 10, paddingVertical: 5, borderRadius: 6, backgroundColor: c.accent, opacity: state.phase === "running" ? 0.5 : 1 }}
-            >
-              <Text style={{ color: c.accentForeground, fontSize: 12 }}>{buttonLabel}</Text>
-            </Pressable>
+            {local !== false && (
+              <Pressable
+                accessibilityRole="button"
+                accessibilityLabel={buttonLabel}
+                disabled={state.phase === "running" || local === null}
+                onPress={run}
+                style={{ paddingHorizontal: 10, paddingVertical: 5, borderRadius: 6, backgroundColor: c.accent, opacity: state.phase === "running" || local === null ? 0.5 : 1 }}
+              >
+                <Text style={{ color: c.accentForeground, fontSize: 12 }}>{buttonLabel}</Text>
+              </Pressable>
+            )}
           </View>
           {failed && (
             <Text selectable style={{ color: c.statusDanger, fontSize: 12 }}>

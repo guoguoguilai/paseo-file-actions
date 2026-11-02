@@ -1,7 +1,7 @@
 import type { RpcInput, RpcOutput } from "@getpaseo/plugin";
 import type { PluginSettings } from "@getpaseo/plugin/server";
-import { mergeActions, parseExtensions, resolveAction, settingsSchema, type actionsRpc, type runRpc } from "../shared/file-actions";
-import { nodeRuntime, resolveCommand, runAction } from "./actions";
+import { mergeActions, parseExtensions, resolveAction, settingsSchema, type actionsRpc, type checkRpc, type runRpc } from "../shared/file-actions";
+import { isSameFile, nodeRuntime, resolveCommand, runAction } from "./actions";
 
 type Settings = PluginSettings<typeof settingsSchema>;
 
@@ -31,4 +31,8 @@ export async function runById(input: RpcInput<typeof runRpc>, settings: Settings
   const action = (await storedActions(settings)).find((candidate) => candidate.id === input.actionId);
   if (!action || !action.enabled) return { ok: false, message: `Unknown action: ${input.actionId}` };
   return runAction(action, input.path);
+}
+
+export async function checkFile(input: RpcInput<typeof checkRpc>): Promise<RpcOutput<typeof checkRpc>> {
+  return { local: await isSameFile(input.path, input.size, input.modifiedAt) };
 }

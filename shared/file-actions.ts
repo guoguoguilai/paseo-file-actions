@@ -194,3 +194,14 @@ export const runRpc = defineRpc({
     z.object({ ok: z.literal(false), message: z.string() }),
   ]),
 });
+
+/** Asks the daemon whether it holds this very file, so actions only run on the file's own machine. */
+export const checkRpc = defineRpc({
+  name: "file-actions.check",
+  input: z.object({
+    path: z.string().min(1).max(4096),
+    size: z.number().nonnegative(),
+    modifiedAt: z.string().max(64),
+  }),
+  output: z.object({ local: z.boolean() }),
+});

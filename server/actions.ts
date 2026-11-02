@@ -132,3 +132,17 @@ export async function runAction(action: Action, file: string, runtime: Runtime =
     return { ok: false, message: error instanceof Error ? error.message : String(error) };
   }
 }
+
+/** Clock skew and file systems that round times make an exact match too strict. */
+const MTIME_TOLERANCE_MS = 2000;
+
+/**
+ * True when this machine holds the same file: it exists here with the same size and modification
+ * time. A path that only happens to exist on another machine does not match.
+ */
+export async function isSameFile(path: string, size: number, modifiedAt: string): Promise<boolean> {
+  const info = await stat(path).catch(() => null);
+  if (!info?.isFile() || info.size !== size) return false;
+  const expected = Date.parse(modifiedAt);
+  return Number.isNaN(expected) || Math.abs(info.mtimeMs - expected) <= MTIME_TOLERANCE_MS;
+}
