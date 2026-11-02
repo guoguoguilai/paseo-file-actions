@@ -9,7 +9,7 @@ opening a Markdown note in Obsidian, showing the file in Finder, or running a te
 ## Install
 
 ```bash
-paseo plugin add npm:@guoguoguilai/paseo-file-actions
+paseo plugin add guoguoguilai/file-actions
 ```
 
 Requires Paseo 0.14.0 or later. The built-in actions are for macOS.
